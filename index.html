@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>원기둥 사다리게임</title>
+
+<style>
+  :root {
+    color-scheme: light;
+    --blue: #2563eb;
+    --border: #dce3ee;
+    --text: #172033;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #f3f6fb;
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  main {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 16px 40px;
+  }
+
+  h1 { margin-bottom: 8px; font-size: 28px; }
+  h2 { font-size: 19px; margin-top: 0; }
+  p { line-height: 1.6; }
+  .muted { color: #64748b; font-size: 14px; }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    margin-top: 18px;
+    box-shadow: 0 5px 20px #17203306;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  button, input {
+    font: inherit;
+    border-radius: 9px;
+  }
+
+  button {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled) { background: #eff6ff; }
+
+  button.primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #cbd5e1;
+    background: white;
+  }
+
+  #count { width: 85px; }
+
+  #nameFields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+
+  #nameFields label {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  #players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 16px 0;
+  }
+
+  .player {
+    border-left: 5px solid var(--player-color);
+  }
+
+  .player.done { background: #f0fdf4; }
+
+  .player.active {
+    background: #fff7ed;
+    outline: 2px solid #fb923c;
+  }
+
+  .canvas-wrap {
+    overflow: hidden;
+    background: linear-gradient(#f8fbff, #ffffff);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 590px;
+  }
+
+  #status {
+    min-height: 28px;
+    margin: 14px 0;
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  progress {
+    width: 100%;
+    height: 12px;
+    accent-color: var(--blue);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  #rotation { width: 180px; }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th { background: #f1f5f9; }
+
+  .badge {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 600px) {
+    main { margin-top: 20px; }
+    .card { padding: 16px; }
+    canvas { height: 500px; }
+    .results-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 24px; }
+  }
+</style>
+</head>
+
+<body>
+<main>
+  <h1>원기둥 사다리게임</h1>
+  <p class="muted">
+    이름을 클릭해서 한 명씩 내려가세요.
+    모든 참가자가 도착하면 전체 결과를 공개할 수 있습니다.
+  </p>
+
+  <section class="card">
+    <h2>1. 참가자 설정</h2>
+
+    <div class="row">
+      <label for="count">인원수</label>
+      <input id="count" type="number" min="2" max="24" value="6">
+      <button id="applyCount" type="button">입력칸 변경</button>
+    </div>
+
+    <div id="nameFields"></div>
+
+    <div class="row">
+      <button id="generate" class="primary" type="button">
+        사다리 생성 / 새 게임
+      </button>
+      <span class="muted">2~24명 · 이름이 비어 있으면 번호 사용</span>
+    </div>
+  </section>
+
+  <section id="gamePanel" class="card" hidden>
+    <h2>2. 이름을 클릭해서 출발</h2>
+
+    <div id="players"></div>
+
+    <div class="canvas-wrap">
+      <canvas id="canvas" aria-label="원기둥 사다리게임"></canvas>
+    </div>
+
+    <div class="controls">
+      <label for="rotation">원기둥 회전</label>
+      <input id="rotation" type="range" min="-180" max="180" value="-25">
+      <span class="muted">뒤쪽 이름이 가려지면 회전하세요.</span>
+    </div>
+
+    <div id="status" role="status" aria-live="polite"></div>
+
+    <progress id="progress" value="0" max="6"></progress>
+
+    <div class="controls">
+      <span id="completedText">0 / 6명 완료</span>
+      <button id="reveal" class="primary" type="button" disabled>
+        최종 결과 보기 🔒
+      </button>
+    </div>
+  </section>
+
+  <section id="resultPanel" class="card" hidden>
+    <h2>3. 최종 결과</h2>
+
+    <div class="results-grid">
+      <div>
+        <h3>참가자별 대응</h3>
+        <table>
+          <thead>
+            <tr><th>참가자</th><th>도착 숫자</th></tr>
+          </thead>
+          <tbody id="resultByName"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>숫자순</h3>
+        <table>
+          <thead>
+            <tr><th>숫자</th><th>참가자</th></tr>
+          </thead>
+          <tbody id="resultByNumber"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const canvas = $("canvas");
+const ctx = canvas.getContext("2d");
+
+const DURATION = 4000;
+const TAU = Math.PI * 2;
+
+let game = null;
+let animationFrame = null;
+
+function colorFor(index, count) {
+  return `hsl(${Math.round(index * 360 / count)}, 72%, 43%)`;
+}
+
+// 偏りのない整数を暗号学的乱数から生成
+function randomInt(max) {
+  const range = 0x100000000;
+  const limit = range - (range % max);
+  const buffer = new Uint32Array(1);
+
+  do {
+    crypto.getRandomValues(buffer);
+  } while (buffer[0] >= limit);
+
+  return buffer[0] % max;
+}
+
+function getCount() {
+  const n = Number($("count").value);
+
+  if (!Number.isInteger(n) || n < 2 || n > 24) {
+    alert("인원수는 2~24 사이의 정수로 입력해 주세요.");
+    return null;
+  }
+
+  return n;
+}
+
+function makeNameFields() {
+  const n = getCount();
+  if (n === null) return;
+
+  const previous = [...$("nameFields").querySelectorAll("input")]
+    .map(input => input.value);
+
+  $("nameFields").replaceChildren();
+
+  for (let i = 0; i < n; i++) {
+    const label = document.createElement("label");
+    label.textContent = `${i + 1}번 참가자`;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.maxLength = 20;
+    input.placeholder = `${i + 1}번`;
+    input.value = previous[i] || "";
+    input.setAttribute("aria-label", `${i + 1}번 참가자 이름`);
+
+    label.append(input);
+    $("nameFields").append(label);
+  }
+}
+
+// theta: 원기둥 둘레 각도, z: 위에서 아래로 0~1
+function point(theta, z) {
+  return { theta, z };
+}
+
+function tracePath(startLane, bridges, n) {
+  const step = TAU / n;
+  let lane = startLane;
+  let angle = lane * step;
+  const points = [point(angle, 0)];
+
+  for (const bridge of bridges) {
+    points.push(point(angle, bridge.z));
+
+    const nextLane = (bridge.lane + 1) % n;
+    let direction = 0;
+
+    if (lane === bridge.lane) {
+      direction = 1;
+    } else if (lane === nextLane) {
+      direction = -1;
+    }
+
+    if (direction !== 0) {
+      const from = angle;
+      const to = angle + direction * step;
+      const samples = 24;
+
+      for (let j = 1; j <= samples; j++) {
+        points.push(
+          point(from + (to - from) * j / samples, bridge.z)
+        );
+      }
+
+      angle = to;
+      lane = direction === 1 ? nextLane : bridge.lane;
+    }
+  }
+
+  points.push(point(angle, 1));
+
+  // 원기둥 표면에서의 누적 경로 길이
+  const cumulative = [0];
+
+  for (let i = 1; i < points.length; i++) {
+    const da = points[i].theta - points[i - 1].theta;
+    const dz = (points[i].z - points[i - 1].z) * 3;
+    cumulative.push(
+      cumulative[i - 1] + Math.hypot(da, dz)
+    );
+  }
+
+  return {
+    points,
+    cumulative,
+    length: cumulative[cumulative.length - 1],
+    destination: lane
+  };
+}
+
+function generateGame() {
+  const n = getCount();
+  if (n === null) return;
+
+  const fields = [...$("nameFields").querySelectorAll("input")];
+
+  if (fields.length !== n) {
+    makeNameFields();
+    alert("인원수에 맞춰 입력칸을 변경했습니다. 이름 확인 후 다시 생성하세요.");
+    return;
+  }
+
+  if (game && !confirm("현재 게임을 지우고 새 게임을 만들까요?")) {
+    return;
+  }
+
+  cancelAnimationFrame(animationFrame);
+
+  const names = fields.map(
+    (input, i) => input.value.trim() || `${i + 1}번`
+  );
+
+  const bridgeCount = Math.max(24, n * 8);
+  const bridges = [];
+
+  for (let k = 0; k < bridgeCount; k++) {
+    bridges.push({
+      z: 0.045 + (k + 1) * 0.91 / (bridgeCount + 1),
+      lane: randomInt(n)
+    });
+  }
+
+  // 마지막 경로와 첫 경로 사이의 연결을 최소 하나 포함
+  if (!bridges.some(bridge => bridge.lane === n - 1)) {
+    bridges[randomInt(bridgeCount)].lane = n - 1;
+  }
+
+  game = {
+    n,
+    names,
+    bridges,
+    paths: names.map((_, i) => tracePath(i, bridges, n)),
+    done: new Set(),
+    busy: false,
+    active: null,
+    fraction: 0,
+    revealed: false
+  };
+
+  $("players").replaceChildren();
+
+  names.forEach((name, i) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "player";
+    button.style.setProperty("--player-color", colorFor(i, n));
+    button.addEventListener("click", () => startPlayer(i));
+    $("players").append(button);
+  });
+
+  $("gamePanel").hidden = false;
+  $("resultPanel").hidden = true;
+  $("resultByName").replaceChildren();
+  $("resultByNumber").replaceChildren();
+  $("status").textContent = "참가자 이름을 클릭하세요.";
+  $("progress").max = n;
+
+  updateControls();
+  resizeCanvas();
+}
+
+function updateControls() {
+  if (!game) return;
+
+  [...$("players").children].forEach((button, i) => {
+    const done = game.done.has(i);
+    const active = game.busy && game.active === i;
+
+    button.textContent =
+      game.names[i] + (active ? " · 이동 중" : done ? " ✓" : "");
+
+    button.disabled = game.busy || done;
+    button.classList.toggle("done", done);
+    button.classList.toggle("active", active);
+  });
+
+  $("progress").value = game.done.size;
+  $("completedText").textContent =
+    `${game.done.size} / ${game.n}명 완료`;
+
+  const ready = game.done.size === game.n && !game.busy;
+
+  $("reveal").disabled = !ready || game.revealed;
+  $("reveal").textContent = game.revealed
+    ? "결과 공개 완료"
+    : ready
+      ? "최종 결과 보기"
+      : "최종 결과 보기 🔒";
+}
+
+function startPlayer(index) {
+  if (!game || game.busy || game.done.has(index)) return;
+
+  const currentGame = game;
+
+  game.busy = true;
+  game.active = index;
+  game.fraction = 0;
+
+  $("status").textContent = `${game.names[index]} — 출발!`;
+  updateControls();
+  draw();
+
+  let startedAt = null;
+
+  function tick(timestamp) {
+    if (game !== currentGame) return;
+
+    if (startedAt === null) startedAt = timestamp;
+
+    game.fraction = Math.min((timestamp - startedAt) / DURATION, 1);
+    draw();
+
+    if (game.fraction < 1) {
+      animationFrame = requestAnimationFrame(tick);
+      return;
+    }
+
+    game.busy = false;
+    game.done.add(index);
+
+    const number = game.paths[index].destination + 1;
+
+    $("status").textContent =
+      `${game.names[index]} → ${number}번 도착!` +
+      (game.done.size === game.n
+        ? " 모든 참가자가 도착했습니다. 최종 결과를 확인하세요."
+        : "");
+
+    updateControls();
+  }
+
+  animationFrame = requestAnimationFrame(tick);
+}
+
+// 원기둥을 타원 투영하여 표시
+function project(p, width, height) {
+  const rotation = Number($("rotation").value) * Math.PI / 180;
+  const angle = p.theta + rotation;
+
+  const radius = Math.min(width * 0.31, 220);
+  const ellipse = Math.min(48, radius * 0.25);
+  const top = 90;
+  const bottom = height - 90;
+  const depth = Math.sin(angle);
+
+  return {
+    x: width / 2 + Math.cos(angle) * radius,
+    y: top + p.z * (bottom - top) + depth * ellipse,
+    depth
+  };
+}
+
+function visiblePath(path, fraction) {
+  if (fraction >= 1) return path.points;
+
+  const target = path.length * fraction;
+  const result = [path.points[0]];
+
+  for (let i = 1; i < path.points.length; i++) {
+    if (path.cumulative[i] <= target) {
+      result.push(path.points[i]);
+      continue;
+    }
+
+    const before = path.cumulative[i - 1];
+    const length = path.cumulative[i] - before;
+    const ratio = length > 0 ? (target - before) / length : 0;
+    const a = path.points[i - 1];
+    const b = path.points[i];
+
+    result.push(point(
+      a.theta + (b.theta - a.theta) * ratio,
+      a.z + (b.z - a.z) * ratio
+    ));
+    break;
+  }
+
+  return result;
+}
+
+function draw() {
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  ctx.clearRect(0, 0, width, height);
+  if (!game) return;
+
+  const segments = [];
+
+  function addSegment(a, b, highlighted = false) {
+    const pa = project(a, width, height);
+    const pb = project(b, width, height);
+
+    segments.push({
+      a: pa,
+      b: pb,
+      depth: (pa.depth + pb.depth) / 2,
+      highlighted
+    });
+  }
+
+  // 위아래 테두리
+  for (const z of [0, 1]) {
+    for (let j = 0; j < 120; j++) {
+      addSegment(
+        point(j * TAU / 120, z),
+        point((j + 1) * TAU / 120, z)
+      );
+    }
+  }
+
+  // 세로 경로
+  for (let i = 0; i < game.n; i++) {
+    const angle = i * TAU / game.n;
+    addSegment(point(angle, 0), point(angle, 1));
+  }
+
+  // 가로 연결선
+  for (const bridge of game.bridges) {
+    const start = bridge.lane * TAU / game.n;
+    const step = TAU / game.n;
+
+    for (let j = 0; j < 20; j++) {
+      addSegment(
+        point(start + step * j / 20, bridge.z),
+        point(start + step * (j + 1) / 20, bridge.z)
+      );
+    }
+  }
+
+  let visible = null;
+
+  if (game.active !== null) {
+    visible = visiblePath(
+      game.paths[game.active], game.fraction
+    );
+
+    for (let i = 1; i < visible.length; i++) {
+      addSegment(visible[i - 1], visible[i], true);
+    }
+  }
+
+  // 뒤쪽부터 그려 원기둥의 앞뒤 관계를 표현
+  segments.sort(
+    (a, b) => a.depth - b.depth ||
+      Number(a.highlighted) - Number(b.highlighted)
+  );
+
+  for (const segment of segments) {
+    ctx.beginPath();
+    ctx.moveTo(segment.a.x, segment.a.y);
+    ctx.lineTo(segment.b.x, segment.b.y);
+
+    if (segment.highlighted) {
+      ctx.strokeStyle = colorFor(game.active, game.n);
+      ctx.lineWidth = 4;
+      ctx.globalAlpha = segment.depth < 0 ? 0.65 : 1;
+    } else {
+      ctx.strokeStyle = segment.depth < 0 ? "#b9c3d2" : "#64748b";
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = segment.depth < 0 ? 0.45 : 0.85;
+    }
+
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+
+  // 출발 이름과 도착 숫자
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  for (let i = 0; i < game.n; i++) {
+    const angle = i * TAU / game.n;
+    const top = project(point(angle, 0), width, height);
+    const bottom = project(point(angle, 1), width, height);
+
+    ctx.font = "600 12px system-ui, sans-serif";
+    ctx.fillStyle = colorFor(i, game.n);
+    ctx.fillText(game.names[i], top.x, top.y - 20);
+
+    ctx.font = "700 15px system-ui, sans-serif";
+    ctx.fillStyle = "#172033";
+    ctx.fillText(String(i + 1), bottom.x, bottom.y + 22);
+  }
+
+  // 이동 중인 점은 잘 보이도록 가장 위에 표시
+  if (visible && visible.length) {
+    const head = project(visible[visible.length - 1], width, height);
+
+    ctx.beginPath();
+    ctx.arc(head.x, head.y, 6, 0, TAU);
+    ctx.fillStyle = colorFor(game.active, game.n);
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+  }
+}
+
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+
+function appendResultRow(target, index, number, numberFirst) {
+  const row = document.createElement("tr");
+  const nameCell = document.createElement("td");
+  const numberCell = document.createElement("td");
+
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.style.background = colorFor(index, game.n);
+
+  nameCell.append(
+    badge,
+    document.createTextNode(game.names[index])
+  );
+  numberCell.textContent = String(number);
+
+  if (numberFirst) {
+    row.append(numberCell, nameCell);
+  } else {
+    row.append(nameCell, numberCell);
+  }
+
+  target.append(row);
+}
+
+function revealResults() {
+  if (!game || game.busy ||
+      game.done.size !== game.n || game.revealed) {
+    return;
+  }
+
+  $("resultByName").replaceChildren();
+  $("resultByNumber").replaceChildren();
+
+  const results = game.paths.map((path, index) => ({
+    index,
+    number: path.destination + 1
+  }));
+
+  results.forEach(({ index, number }) => {
+    appendResultRow(
+      $("resultByName"), index, number, false
+    );
+  });
+
+  [...results]
+    .sort((a, b) => a.number - b.number)
+    .forEach(({ index, number }) => {
+      appendResultRow(
+        $("resultByNumber"), index, number, true
+      );
+    });
+
+  game.revealed = true;
+  updateControls();
+
+  $("resultPanel").hidden = false;
+  $("resultPanel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+$("applyCount").addEventListener("click", makeNameFields);
+$("generate").addEventListener("click", generateGame);
+$("reveal").addEventListener("click", revealResults);
+$("rotation").addEventListener("input", draw);
+window.addEventListener("resize", resizeCanvas);
+
+makeNameFields();
+</script>
+</body>
+</html>
