@@ -13,7 +13,9 @@
     --border: #dbe3ef;
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     margin: 0;
@@ -35,8 +37,14 @@
     font-size: clamp(23px, 5vw, 30px);
   }
 
-  h2 { margin: 0 0 16px; font-size: 19px; }
-  h3 { font-size: 16px; }
+  h2 {
+    margin: 0 0 16px;
+    font-size: 19px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
 
   .muted {
     color: #64748b;
@@ -59,7 +67,11 @@
     gap: 12px;
   }
 
-  button, input, textarea { font: inherit; }
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
 
   button {
     min-height: 46px;
@@ -72,7 +84,9 @@
     touch-action: manipulation;
   }
 
-  button:hover:not(:disabled) { background: #eff6ff; }
+  button:hover:not(:disabled) {
+    background: #eff6ff;
+  }
 
   button.primary {
     background: var(--blue);
@@ -103,7 +117,9 @@
     font-size: 16px;
   }
 
-  #count { width: 85px; }
+  #count {
+    width: 85px;
+  }
 
   #nameFields {
     display: grid;
@@ -133,7 +149,9 @@
     overflow-wrap: anywhere;
   }
 
-  .player.done { background: #f0fdf4; }
+  .player.done {
+    background: #f0fdf4;
+  }
 
   .player.active {
     background: #fff7ed;
@@ -175,7 +193,9 @@
     accent-color: var(--blue);
   }
 
-  #rotation { width: min(210px, 55vw); }
+  #rotation {
+    width: min(210px, 55vw);
+  }
 
   .speed-panel {
     margin: 16px 0;
@@ -232,7 +252,9 @@
     color: #1d4ed8;
   }
 
-  #speedDescription { margin-bottom: 0; }
+  #speedDescription {
+    margin-bottom: 0;
+  }
 
   #resultCard {
     display: flex;
@@ -274,7 +296,9 @@
     accent-color: var(--blue);
   }
 
-  #reveal { margin-left: auto; }
+  #reveal {
+    margin-left: auto;
+  }
 
   .results-grid {
     display: grid;
@@ -288,14 +312,17 @@
     table-layout: fixed;
   }
 
-  th, td {
+  th,
+  td {
     padding: 12px 10px;
     text-align: left;
     border-bottom: 1px solid var(--border);
     overflow-wrap: anywhere;
   }
 
-  th { background: #f1f5f9; }
+  th {
+    background: #f1f5f9;
+  }
 
   .color-dot {
     display: inline-block;
@@ -329,7 +356,9 @@
     font-size: 16px;
   }
 
-  [hidden] { display: none !important; }
+  [hidden] {
+    display: none !important;
+  }
 
   @media (max-width: 600px) {
     main {
@@ -337,25 +366,45 @@
       padding: 0 9px 24px;
     }
 
-    .card { padding: 16px 11px; }
+    .card {
+      padding: 16px 11px;
+    }
 
-    #nameFields, #players {
+    #nameFields,
+    #players {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 9px;
     }
 
-    canvas { height: 550px; }
+    canvas {
+      height: 550px;
+    }
 
-    #generate, #reveal, #copyResults { width: 100%; }
-    #reveal { margin-left: 0; }
-    .results-grid { grid-template-columns: 1fr; }
+    #generate,
+    #reveal,
+    #copyResults {
+      width: 100%;
+    }
+
+    #reveal {
+      margin-left: 0;
+    }
+
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
 
     .speed-presets {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    #travelTime { min-width: 90px; }
-    #resultCard { padding: 13px; }
+    #travelTime {
+      min-width: 90px;
+    }
+
+    #resultCard {
+      padding: 13px;
+    }
 
     #bigNumber {
       min-width: 65px;
@@ -372,8 +421,8 @@
 
   <p class="muted">
     이름을 누르면 설정한 속도로 내려갑니다.
-    기본 이동 시간은 7.2초입니다.
-    사다리와 도착 숫자는 새 게임을 만들 때만 바뀝니다.
+    도착 숫자는 원기둥 밑면의 각 경로 끝점에 표시됩니다.
+    숫자 배정은 새 게임을 만들 때만 바뀝니다.
   </p>
 
   <section class="card">
@@ -404,7 +453,7 @@
       </button>
 
       <span class="muted">
-        2~24명 · 빈 이름은 참가자 번호 사용
+        2~24명 · 이름을 비우면 참가자 번호 사용
       </span>
     </div>
   </section>
@@ -418,7 +467,7 @@
       <canvas
         id="canvas"
         role="img"
-        aria-label="원기둥 사다리와 무작위 도착 숫자"
+        aria-label="원기둥 사다리와 밑면에 직접 표시된 도착 숫자"
       >
         참가자 이름 버튼으로 진행할 수 있습니다.
         도착 결과는 아래 안내와 결과표에 표시됩니다.
@@ -502,8 +551,9 @@
 
     <p class="muted">
       완료한 이름을 다시 누르면 같은 경로를 재생합니다.
-      아래 숫자 배지는 회전해도 위치가 고정되어 있고,
-      도착 후 해당 숫자까지 안내선이 표시됩니다.
+      도착 숫자는 세로 경로의 밑면 끝점에 직접 표시되며
+      원기둥과 함께 회전합니다.
+      뒤쪽 숫자가 겹치면 수동 회전으로 확인하세요.
     </p>
 
     <div id="resultCard" role="status" aria-live="polite">
@@ -583,8 +633,8 @@
     </div>
 
     <p class="muted">
-      도착 숫자 오름차순으로 정렬한 이름만 한 줄씩 복사합니다.
-      숫자나 ‘번째’는 포함되지 않습니다.
+      도착 숫자 오름차순으로 정렬된 이름만 한 줄씩 복사합니다.
+      숫자나 ‘번째’는 복사되지 않습니다.
     </p>
 
     <div
@@ -723,6 +773,7 @@ function makeNameFields() {
   if (game && game.busy) return;
 
   const count = getCount();
+
   if (count === null) return;
 
   const previous = [
@@ -830,7 +881,9 @@ function outputFor(index) {
 }
 
 function visiblePath(path, fraction) {
-  if (fraction >= 1) return path.points;
+  if (fraction >= 1) {
+    return path.points;
+  }
 
   const target =
     path.length * Math.max(0, fraction);
@@ -843,7 +896,8 @@ function visiblePath(path, fraction) {
       continue;
     }
 
-    const before = path.cumulative[i - 1];
+    const before =
+      path.cumulative[i - 1];
 
     const distance =
       path.cumulative[i] - before;
@@ -877,7 +931,6 @@ function updateControls() {
     const active =
       game.busy && game.active === index;
 
-    // 이름 앞에 참가자 번호를 붙이지 않는다.
     button.textContent =
       game.names[index] +
       (
@@ -943,6 +996,7 @@ function generateGame() {
   if (game && game.busy) return;
 
   const count = getCount();
+
   if (count === null) return;
 
   const fields = [
@@ -973,7 +1027,6 @@ function generateGame() {
       input.value.trim() || `참가자 ${index + 1}`
   );
 
-  // 복잡한 초기 버전보다 연결선을 25% 줄인 설정
   const bridgeCount = Math.max(18, count * 6);
 
   const bridges = [];
@@ -990,6 +1043,7 @@ function generateGame() {
     bridges[randomInt(bridgeCount)].lane = count - 1;
   }
 
+  // 밑면 숫자 배정은 여기서 한 번만 생성
   const outputs = shuffle(
     Array.from(
       { length: count },
@@ -1165,9 +1219,7 @@ function animate() {
 
 function finishPlayer() {
   const index = game.active;
-
-  const wasDone =
-    game.done.has(index);
+  const wasDone = game.done.has(index);
 
   game.busy = false;
   game.fraction = 1;
@@ -1190,31 +1242,12 @@ function finishPlayer() {
 }
 
 function geometry() {
-  const maxColumns = Math.max(
-    1,
-    Math.min(
-      8,
-      Math.floor((viewWidth - 20) / 44)
-    )
-  );
-
-  const columns = Math.min(game.n, maxColumns);
-
-  const rows =
-    Math.ceil(game.n / columns);
-
-  const labelTop =
-    viewHeight - rows * 46 - 8;
-
   return {
     cx: viewWidth / 2,
     radius: Math.min(viewWidth * 0.36, 265),
     ellipse: Math.min(viewWidth * 0.085, 54),
     top: 88,
-    bottom: labelTop - 83,
-    labelTop,
-    columns,
-    rows
+    bottom: viewHeight - 85
   };
 }
 
@@ -1239,38 +1272,6 @@ function project(p) {
   };
 }
 
-function roundedBox(x, y, width, height, radius) {
-  ctx.beginPath();
-
-  ctx.moveTo(x + radius, y);
-
-  ctx.arcTo(
-    x + width, y,
-    x + width, y + height,
-    radius
-  );
-
-  ctx.arcTo(
-    x + width, y + height,
-    x, y + height,
-    radius
-  );
-
-  ctx.arcTo(
-    x, y + height,
-    x, y,
-    radius
-  );
-
-  ctx.arcTo(
-    x, y,
-    x + width, y,
-    radius
-  );
-
-  ctx.closePath();
-}
-
 function shortName(name, maxLength = 5) {
   const chars = Array.from(name);
 
@@ -1279,28 +1280,7 @@ function shortName(name, maxLength = 5) {
     : name;
 }
 
-function badgePosition(lane) {
-  const g = geometry();
-
-  const slot =
-    (viewWidth - 20) / g.columns;
-
-  return {
-    x: 10 + (lane % g.columns + 0.5) * slot,
-
-    y:
-      g.labelTop +
-      Math.floor(lane / g.columns) * 46 +
-      19,
-
-    width: Math.min(46, slot - 6),
-    height: 36
-  };
-}
-
 function drawOutputLabels() {
-  const g = geometry();
-
   const owners = new Map();
 
   for (const index of game.done) {
@@ -1310,125 +1290,123 @@ function drawOutputLabels() {
     );
   }
 
-  const selected =
+  const selectedLane =
     game.active !== null && !game.busy
       ? game.paths[game.active].destination
       : null;
 
-  // 실제 도착점
+  const mobile =
+    viewWidth < 600;
+
+  const radius = mobile
+    ? (game.n > 12 ? 12 : 15)
+    : (game.n > 16 ? 14 : 18);
+
+  const fontSize = mobile
+    ? (game.n > 12 ? 13 : 17)
+    : (game.n > 16 ? 16 : 20);
+
+  const labels = [];
+
   for (let lane = 0; lane < game.n; lane++) {
-    const p = project(
+    const endpoint = project(
       point(lane * TAU / game.n, 1)
     );
 
-    const owner =
-      owners.get(lane);
+    labels.push({
+      lane,
+      endpoint,
+      owner: owners.get(lane),
+      selected: lane === selectedLane
+    });
+  }
 
+  // 그리기 순서만 뒤쪽 → 앞쪽으로 정렬
+  // 숫자와 경로의 대응은 변경하지 않는다.
+  labels.sort(
+    (a, b) =>
+      a.endpoint.depth - b.endpoint.depth
+  );
+
+  function drawLabel(label) {
+    const {
+      lane,
+      endpoint,
+      owner,
+      selected
+    } = label;
+
+    const completed =
+      owner !== undefined;
+
+    const behind =
+      endpoint.depth < 0;
+
+    const color = completed
+      ? colorFor(owner, game.n)
+      : "#334155";
+
+    ctx.save();
+
+    ctx.globalAlpha =
+      selected ? 1 : behind ? 0.72 : 1;
+
+    // 각 세로 경로의 정확한 밑면 끝점에 숫자 표시
     ctx.beginPath();
 
     ctx.arc(
-      p.x,
-      p.y,
-      lane === selected ? 6 : 3,
+      endpoint.x,
+      endpoint.y,
+      selected ? radius + 2 : radius,
       0,
       TAU
     );
 
-    ctx.fillStyle = owner !== undefined
-      ? colorFor(owner, game.n)
-      : "#64748b";
-
-    ctx.fill();
-  }
-
-  // 도착 후 선택된 경로의 안내선만 표시
-  if (selected !== null) {
-    const p = project(
-      point(selected * TAU / game.n, 1)
-    );
-
-    const badge =
-      badgePosition(selected);
-
-    ctx.beginPath();
-
-    ctx.moveTo(p.x, p.y);
-
-    ctx.bezierCurveTo(
-      p.x,
-      g.labelTop - 10,
-      badge.x,
-      g.labelTop - 10,
-      badge.x,
-      badge.y - badge.height / 2
-    );
-
-    ctx.strokeStyle =
-      colorFor(game.active, game.n);
-
-    ctx.lineWidth = 3;
-    ctx.stroke();
-  }
-
-  // 숫자 배지 위치는 회전과 관계없이 고정
-  for (let lane = 0; lane < game.n; lane++) {
-    const badge =
-      badgePosition(lane);
-
-    const owner =
-      owners.get(lane);
-
-    const done =
-      owner !== undefined;
-
-    const color = done
-      ? colorFor(owner, game.n)
-      : "#64748b";
-
-    roundedBox(
-      badge.x - badge.width / 2,
-      badge.y - badge.height / 2,
-      badge.width,
-      badge.height,
-      8
-    );
-
     ctx.fillStyle =
-      done ? color : "#ffffff";
+      completed ? color : "#ffffff";
 
     ctx.fill();
 
     ctx.strokeStyle =
-      lane === selected ? "#111827" : color;
+      selected ? "#0f172a" : color;
 
     ctx.lineWidth =
-      lane === selected ? 3 : 1.5;
+      selected ? 3 : 1.6;
 
     ctx.stroke();
 
     ctx.fillStyle =
-      done ? "#ffffff" : "#0f172a";
+      completed ? "#ffffff" : "#0f172a";
 
-    ctx.font = "800 20px system-ui, sans-serif";
+    ctx.font =
+      `800 ${fontSize}px system-ui, sans-serif`;
+
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
     ctx.fillText(
       String(game.outputs[lane]),
-      badge.x,
-      badge.y + 1
+      endpoint.x,
+      endpoint.y + 1
     );
+
+    ctx.restore();
   }
 
-  ctx.fillStyle = "#64748b";
-  ctx.font = "12px system-ui, sans-serif";
-  ctx.textAlign = "left";
+  for (const label of labels) {
+    if (!label.selected) {
+      drawLabel(label);
+    }
+  }
 
-  ctx.fillText(
-    "도착 숫자 · 위치 고정",
-    12,
-    g.labelTop - 17
+  // 도착한 숫자는 마지막에 그려 강조
+  const selectedLabel = labels.find(
+    label => label.selected
   );
+
+  if (selectedLabel) {
+    drawLabel(selectedLabel);
+  }
 }
 
 function drawStartLabels() {
@@ -1536,7 +1514,7 @@ function draw() {
     );
   }
 
-  // 가로 연결선
+  // 이웃 경로 사이 연결선
   for (const bridge of game.bridges) {
     const start =
       bridge.lane * TAU / game.n;
@@ -1622,10 +1600,14 @@ function draw() {
   ctx.globalAlpha = 1;
 
   drawStartLabels();
-  drawOutputLabels();
 
-  // 現在位置
-  if (visible && visible.length) {
+  // 이동 중에만 현재 위치 점 표시
+  // 도착 후에는 숫자를 가리지 않도록 숨긴다.
+  if (
+    game.busy &&
+    visible &&
+    visible.length
+  ) {
     const head = project(
       visible[visible.length - 1]
     );
@@ -1642,6 +1624,9 @@ function draw() {
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
   }
+
+  // 숫자는 경로와 이동점 위에 그려 읽기 쉽게 표시
+  drawOutputLabels();
 
   ctx.fillStyle = "#64748b";
   ctx.font = "12px system-ui, sans-serif";
@@ -1719,7 +1704,6 @@ function appendResultRow(
   dot.style.background =
     colorFor(index, game.n);
 
-  // 이름 앞에 입력 순서 번호를 붙이지 않는다.
   nameCell.append(
     dot,
     document.createTextNode(game.names[index])
@@ -1802,7 +1786,7 @@ async function copyResults() {
 
   const currentGame = game;
 
-  // 도착 숫자순으로 정렬하되, 복사 내용에는 이름만 포함
+  // 숫자순 정렬 후 이름만 복사
   const text = getSortedResults()
     .map(({ name }) => name)
     .join("\n");
@@ -1868,7 +1852,7 @@ $("rotation").addEventListener("input", () => {
   draw();
 });
 
-// 이동 시간
+// 이동 시간 조절
 $("travelTime").addEventListener("input", event => {
   if (game && game.busy) return;
 
@@ -1891,7 +1875,7 @@ document
     });
   });
 
-// 화면 복귀 시 경과 시간에 맞춰 진행
+// 화면 복귀 시 실제 경과 시간에 맞춰 진행
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && game && game.busy) {
     cancelAnimationFrame(frameId);
@@ -1905,7 +1889,7 @@ window.addEventListener(
   resizeCanvas
 );
 
-// 움직임 최소화 설정을 사용하면 자동 회전 기본 해제
+// 움직임 최소화 설정 사용 시 자동 회전 기본 해제
 if (
   window.matchMedia(
     "(prefers-reduced-motion: reduce)"
