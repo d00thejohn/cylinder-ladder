@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>회전 원기둥 사다리게임</title>
+<title>원기둥 사다리게임</title>
 
 <style>
   :root {
@@ -13,7 +13,9 @@
     --border: #dbe3ef;
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     margin: 0;
@@ -35,8 +37,14 @@
     font-size: clamp(23px, 5vw, 30px);
   }
 
-  h2 { margin: 0 0 16px; font-size: 19px; }
-  h3 { font-size: 16px; }
+  h2 {
+    margin: 0 0 16px;
+    font-size: 19px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
 
   .muted {
     color: #64748b;
@@ -59,7 +67,10 @@
     gap: 12px;
   }
 
-  button, input { font: inherit; }
+  button,
+  input {
+    font: inherit;
+  }
 
   button {
     min-height: 46px;
@@ -72,7 +83,9 @@
     touch-action: manipulation;
   }
 
-  button:hover:not(:disabled) { background: #eff6ff; }
+  button:hover:not(:disabled) {
+    background: #eff6ff;
+  }
 
   button.primary {
     background: var(--blue);
@@ -82,10 +95,11 @@
 
   button:disabled {
     cursor: not-allowed;
-    opacity: .45;
+    opacity: 0.45;
   }
 
-  input[type="number"], input[type="text"] {
+  input[type="number"],
+  input[type="text"] {
     width: 100%;
     min-height: 46px;
     padding: 10px;
@@ -95,11 +109,14 @@
     font-size: 16px;
   }
 
-  #count { width: 85px; }
+  #count {
+    width: 85px;
+  }
 
   #nameFields {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    grid-template-columns:
+      repeat(auto-fit, minmax(145px, 1fr));
     gap: 12px;
     margin: 18px 0;
   }
@@ -112,7 +129,8 @@
 
   #players {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    grid-template-columns:
+      repeat(auto-fit, minmax(135px, 1fr));
     gap: 10px;
     margin-bottom: 16px;
   }
@@ -123,7 +141,9 @@
     overflow-wrap: anywhere;
   }
 
-  .player.done { background: #f0fdf4; }
+  .player.done {
+    background: #f0fdf4;
+  }
 
   .player.active {
     background: #fff7ed;
@@ -195,12 +215,12 @@
     min-width: 78px;
     height: 78px;
     padding: 0 12px;
+    border: 1px solid #bfdbfe;
     border-radius: 16px;
     background: white;
     color: #1d4ed8;
     font-size: 40px;
     font-weight: 800;
-    border: 1px solid #bfdbfe;
   }
 
   progress {
@@ -209,7 +229,9 @@
     accent-color: var(--blue);
   }
 
-  #reveal { margin-left: auto; }
+  #reveal {
+    margin-left: auto;
+  }
 
   .results-grid {
     display: grid;
@@ -222,14 +244,17 @@
     border-collapse: collapse;
   }
 
-  th, td {
+  th,
+  td {
     padding: 12px 10px;
     text-align: left;
     border-bottom: 1px solid var(--border);
     overflow-wrap: anywhere;
   }
 
-  th { background: #f1f5f9; }
+  th {
+    background: #f1f5f9;
+  }
 
   .color-dot {
     display: inline-block;
@@ -251,7 +276,9 @@
     text-align: center;
   }
 
-  [hidden] { display: none !important; }
+  [hidden] {
+    display: none !important;
+  }
 
   @media (max-width: 600px) {
     main {
@@ -259,19 +286,36 @@
       padding: 0 9px 24px;
     }
 
-    .card { padding: 16px 11px; }
+    .card {
+      padding: 16px 11px;
+    }
 
-    #nameFields, #players {
+    #nameFields,
+    #players {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 9px;
     }
 
-    canvas { height: 550px; }
+    canvas {
+      height: 550px;
+    }
 
-    #generate, #reveal { width: 100%; }
-    #reveal { margin-left: 0; }
-    .results-grid { grid-template-columns: 1fr; }
-    #resultCard { padding: 13px; }
+    #generate,
+    #reveal {
+      width: 100%;
+    }
+
+    #reveal {
+      margin-left: 0;
+    }
+
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+
+    #resultCard {
+      padding: 13px;
+    }
 
     #bigNumber {
       min-width: 65px;
@@ -284,11 +328,11 @@
 
 <body>
 <main>
-  <h1>회전 원기둥 사다리게임</h1>
+  <h1>원기둥 사다리게임</h1>
 
   <p class="muted">
-    이름을 누르면 이동하는 점을 따라 원기둥이 회전합니다.
-    아래 숫자는 무작위로 배정되며 게임 중에는 바뀌지 않습니다.
+    이름을 누르면 사다리를 따라 약 4.8초 동안 내려갑니다.
+    밑면 숫자는 무작위로 배정되며 게임 중에는 바뀌지 않습니다.
   </p>
 
   <section class="card">
@@ -296,9 +340,19 @@
 
     <div class="row">
       <label for="count">인원수</label>
-      <input id="count" type="number"
-             min="2" max="24" value="6" inputmode="numeric">
-      <button id="applyCount" type="button">입력칸 변경</button>
+
+      <input
+        id="count"
+        type="number"
+        min="2"
+        max="24"
+        value="6"
+        inputmode="numeric"
+      >
+
+      <button id="applyCount" type="button">
+        입력칸 변경
+      </button>
     </div>
 
     <div id="nameFields"></div>
@@ -307,7 +361,10 @@
       <button id="generate" class="primary" type="button">
         사다리 생성 / 새 게임
       </button>
-      <span class="muted">2~24명 · 빈 이름은 번호 사용</span>
+
+      <span class="muted">
+        2~24명 · 이름을 비우면 번호 사용
+      </span>
     </div>
   </section>
 
@@ -317,8 +374,11 @@
     <div id="players"></div>
 
     <div class="canvas-wrap">
-      <canvas id="canvas" role="img"
-              aria-label="회전하는 원기둥 사다리와 도착 숫자"></canvas>
+      <canvas
+        id="canvas"
+        role="img"
+        aria-label="회전하는 원기둥 사다리와 도착 숫자"
+      ></canvas>
     </div>
 
     <div class="controls">
@@ -328,13 +388,20 @@
       </label>
 
       <label for="rotation">수동 회전</label>
-      <input id="rotation" type="range"
-             min="-180" max="180" value="-25">
+
+      <input
+        id="rotation"
+        type="range"
+        min="-180"
+        max="180"
+        value="-25"
+      >
     </div>
 
     <p class="muted">
-      아래 큰 숫자 배지는 안내선으로 실제 도착점과 연결됩니다.
-      완료한 이름을 다시 누르면 경로를 재생할 수 있습니다.
+      자동 회전이 불편하면 체크를 해제하세요.
+      완료한 이름을 다시 누르면 같은 경로를 재생합니다.
+      아래 숫자 배지는 안내선으로 실제 도착점과 연결되어 있습니다.
     </p>
 
     <div id="resultCard" role="status" aria-live="polite">
@@ -346,7 +413,13 @@
 
     <div class="controls">
       <span id="completedText">0 / 6명 완료</span>
-      <button id="reveal" class="primary" type="button" disabled>
+
+      <button
+        id="reveal"
+        class="primary"
+        type="button"
+        disabled
+      >
         전원 도착 후 결과 공개
       </button>
     </div>
@@ -358,9 +431,13 @@
     <div class="results-grid">
       <div>
         <h3>참가자별 대응</h3>
+
         <table>
           <thead>
-            <tr><th>참가자</th><th>도착 숫자</th></tr>
+            <tr>
+              <th scope="col">참가자</th>
+              <th scope="col">도착 숫자</th>
+            </tr>
           </thead>
           <tbody id="resultByName"></tbody>
         </table>
@@ -368,9 +445,13 @@
 
       <div>
         <h3>숫자순</h3>
+
         <table>
           <thead>
-            <tr><th>숫자</th><th>참가자</th></tr>
+            <tr>
+              <th scope="col">숫자</th>
+              <th scope="col">참가자</th>
+            </tr>
           </thead>
           <tbody id="resultByNumber"></tbody>
         </table>
@@ -383,16 +464,24 @@
 "use strict";
 
 const $ = id => document.getElementById(id);
+
 const canvas = $("canvas");
 const ctx = canvas.getContext("2d");
 
 const TAU = Math.PI * 2;
-const DURATION = 4000;
+
+// 이동 시간: 4.8초
+const DURATION = 4800;
+
+// 값이 클수록 회전이 목표 각도를 더 완만하게 따라간다.
+const ROTATION_SMOOTHING_MS = 120;
 
 let game = null;
 let frameId = null;
+
 let viewWidth = 600;
 let viewHeight = 630;
+
 let rotation = -25 * Math.PI / 180;
 
 function colorFor(index, count) {
@@ -416,6 +505,7 @@ function shuffle(array) {
     const j = randomInt(i + 1);
     [array[i], array[j]] = [array[j], array[i]];
   }
+
   return array;
 }
 
@@ -442,10 +532,12 @@ function getCount() {
 
 function makeNameFields() {
   const count = getCount();
+
   if (count === null) return;
 
-  const previous = [...$("nameFields").querySelectorAll("input")]
-    .map(input => input.value);
+  const previous = [
+    ...$("nameFields").querySelectorAll("input")
+  ].map(input => input.value);
 
   $("nameFields").replaceChildren();
 
@@ -454,12 +546,17 @@ function makeNameFields() {
     label.textContent = `${i + 1}번 참가자`;
 
     const input = document.createElement("input");
+
     input.type = "text";
     input.maxLength = 20;
     input.placeholder = `${i + 1}번`;
     input.value = previous[i] || "";
     input.autocomplete = "off";
-    input.setAttribute("aria-label", `${i + 1}번 참가자 이름`);
+
+    input.setAttribute(
+      "aria-label",
+      `${i + 1}번 참가자 이름`
+    );
 
     label.append(input);
     $("nameFields").append(label);
@@ -472,6 +569,7 @@ function point(theta, z) {
 
 function tracePath(startLane, bridges, count) {
   const step = TAU / count;
+
   let lane = startLane;
   let angle = lane * step;
 
@@ -481,6 +579,7 @@ function tracePath(startLane, bridges, count) {
     points.push(point(angle, bridge.z));
 
     const nextLane = (bridge.lane + 1) % count;
+
     let direction = 0;
 
     if (lane === bridge.lane) {
@@ -495,7 +594,10 @@ function tracePath(startLane, bridges, count) {
 
       for (let j = 1; j <= 24; j++) {
         points.push(
-          point(from + (to - from) * j / 24, bridge.z)
+          point(
+            from + (to - from) * j / 24,
+            bridge.z
+          )
         );
       }
 
@@ -526,11 +628,14 @@ function tracePath(startLane, bridges, count) {
 }
 
 function outputFor(index) {
-  return game.outputs[game.paths[index].destination];
+  const destination = game.paths[index].destination;
+  return game.outputs[destination];
 }
 
 function visiblePath(path, fraction) {
-  if (fraction >= 1) return path.points;
+  if (fraction >= 1) {
+    return path.points;
+  }
 
   const target = path.length * Math.max(0, fraction);
   const result = [path.points[0]];
@@ -543,14 +648,21 @@ function visiblePath(path, fraction) {
 
     const before = path.cumulative[i - 1];
     const distance = path.cumulative[i] - before;
-    const ratio = distance > 0 ? (target - before) / distance : 0;
+
+    const ratio = distance > 0
+      ? (target - before) / distance
+      : 0;
+
     const a = path.points[i - 1];
     const b = path.points[i];
 
-    result.push(point(
-      a.theta + (b.theta - a.theta) * ratio,
-      a.z + (b.z - a.z) * ratio
-    ));
+    result.push(
+      point(
+        a.theta + (b.theta - a.theta) * ratio,
+        a.z + (b.z - a.z) * ratio
+      )
+    );
+
     break;
   }
 
@@ -566,7 +678,13 @@ function updateControls() {
 
     button.textContent =
       game.names[index] +
-      (active ? " · 이동 중" : done ? " · 다시 보기" : "");
+      (
+        active
+          ? " · 이동 중"
+          : done
+            ? " · 다시 보기"
+            : ""
+      );
 
     button.disabled = game.busy;
     button.classList.toggle("done", done);
@@ -574,12 +692,16 @@ function updateControls() {
   });
 
   $("progress").value = game.done.size;
+
   $("completedText").textContent =
     `${game.done.size} / ${game.n}명 완료`;
 
-  const ready = game.done.size === game.n && !game.busy;
+  const ready =
+    game.done.size === game.n && !game.busy;
 
-  $("reveal").disabled = !ready || game.revealed;
+  $("reveal").disabled =
+    !ready || game.revealed;
+
   $("reveal").textContent = game.revealed
     ? "결과 공개 완료"
     : ready
@@ -588,31 +710,53 @@ function updateControls() {
 
   $("rotation").disabled = game.busy;
   $("autoRotate").disabled = game.busy;
+
+  // 이동 도중 실수로 설정을 바꾸지 못하도록 잠근다.
+  $("count").disabled = game.busy;
+  $("applyCount").disabled = game.busy;
+  $("generate").disabled = game.busy;
+
+  $("nameFields").querySelectorAll("input").forEach(input => {
+    input.disabled = game.busy;
+  });
 }
 
 function generateGame() {
   const count = getCount();
+
   if (count === null) return;
 
-  const fields = [...$("nameFields").querySelectorAll("input")];
+  const fields = [
+    ...$("nameFields").querySelectorAll("input")
+  ];
 
   if (fields.length !== count) {
     makeNameFields();
-    alert("입력칸을 변경했습니다. 이름 확인 후 다시 생성하세요.");
+
+    alert(
+      "입력칸을 변경했습니다. 이름 확인 후 다시 생성하세요."
+    );
+
     return;
   }
 
-  if (game && !confirm("현재 게임을 지우고 새 게임을 만들까요?")) {
+  if (
+    game &&
+    !confirm("현재 게임을 지우고 새 게임을 만들까요?")
+  ) {
     return;
   }
 
   cancelAnimationFrame(frameId);
 
   const names = fields.map(
-    (input, index) => input.value.trim() || `${index + 1}번`
+    (input, index) =>
+      input.value.trim() || `${index + 1}번`
   );
 
-  const bridgeCount = Math.max(24, count * 8);
+  // 기존 max(24, count * 8)보다 연결선 25% 감소
+  const bridgeCount = Math.max(18, count * 6);
+
   const bridges = [];
 
   for (let k = 0; k < bridgeCount; k++) {
@@ -622,6 +766,7 @@ function generateGame() {
     });
   }
 
+  // 마지막 경로와 첫 경로 사이 연결선 포함
   if (!bridges.some(bridge => bridge.lane === count - 1)) {
     bridges[randomInt(bridgeCount)].lane = count - 1;
   }
@@ -630,12 +775,18 @@ function generateGame() {
     n: count,
     names,
     bridges,
+
     outputs: shuffle(
-      Array.from({ length: count }, (_, index) => index + 1)
+      Array.from(
+        { length: count },
+        (_, index) => index + 1
+      )
     ),
-    paths: names.map((_, index) =>
-      tracePath(index, bridges, count)
+
+    paths: names.map(
+      (_, index) => tracePath(index, bridges, count)
     ),
+
     done: new Set(),
     active: null,
     busy: false,
@@ -650,21 +801,32 @@ function generateGame() {
 
   names.forEach((name, index) => {
     const button = document.createElement("button");
+
     button.type = "button";
     button.className = "player";
+
     button.style.setProperty(
-      "--player-color", colorFor(index, count)
+      "--player-color",
+      colorFor(index, count)
     );
-    button.addEventListener("click", () => startPlayer(index));
+
+    button.addEventListener(
+      "click",
+      () => startPlayer(index)
+    );
+
     $("players").append(button);
   });
 
   $("gamePanel").hidden = false;
   $("resultPanel").hidden = true;
+
   $("resultByName").replaceChildren();
   $("resultByNumber").replaceChildren();
 
-  $("status").textContent = "참가자 이름을 눌러 주세요.";
+  $("status").textContent =
+    "참가자 이름을 눌러 주세요.";
+
   $("bigNumber").textContent = "?";
   $("bigNumber").style.color = "#1d4ed8";
   $("resultCard").style.borderColor = "#bfdbfe";
@@ -683,17 +845,24 @@ function startPlayer(index) {
   game.active = index;
   game.busy = true;
   game.fraction = 0;
-  game.rotateDuringRun = $("autoRotate").checked;
 
-  // 출발점이 앞쪽 중앙에 오도록 시작 방향 설정
+  game.rotateDuringRun =
+    $("autoRotate").checked;
+
+  // 출발점을 앞쪽 중앙에 배치한다.
   if (game.rotateDuringRun) {
-    rotation = Math.PI / 2 - game.paths[index].points[0].theta;
+    rotation =
+      Math.PI / 2 -
+      game.paths[index].points[0].theta;
+
     syncRotationSlider();
   }
 
   const color = colorFor(index, game.n);
 
-  $("status").textContent = `${game.names[index]} — 출발!`;
+  $("status").textContent =
+    `${game.names[index]} — 출발!`;
+
   $("bigNumber").textContent = "…";
   $("bigNumber").style.color = color;
   $("resultCard").style.borderColor = color;
@@ -715,36 +884,43 @@ function animate() {
   const delta = Math.max(0, now - game.lastFrameAt);
 
   game.lastFrameAt = now;
-  game.fraction = Math.min(elapsed / DURATION, 1);
+
+  game.fraction = Math.min(
+    elapsed / DURATION,
+    1
+  );
 
   const path = visiblePath(
-    game.paths[game.active], game.fraction
+    game.paths[game.active],
+    game.fraction
   );
+
   const head = path[path.length - 1];
 
   if (game.rotateDuringRun) {
-    // 이동점을 앞쪽 중앙으로 보내는 목표 회전각
-    const desired = Math.PI / 2 - head.theta;
+    const desired =
+      Math.PI / 2 - head.theta;
 
-    // 가장 짧은 방향으로 부드럽게 회전
-    const difference = normalizeAngle(desired - rotation);
-    const smoothing = 1 - Math.exp(-delta / 75);
+    const difference =
+      normalizeAngle(desired - rotation);
+
+    const smoothing =
+      1 - Math.exp(-delta / ROTATION_SMOOTHING_MS);
 
     rotation += difference * smoothing;
+
     syncRotationSlider();
   }
 
   if (game.fraction >= 1) {
-    if (game.rotateDuringRun) {
-      rotation = Math.PI / 2 - head.theta;
-      syncRotationSlider();
-    }
-
+    // 도착 직전의 아주 작은 회전 오차는 그대로 두어
+    // 끝나는 순간 갑자기 회전하지 않도록 한다.
     finishPlayer();
     return;
   }
 
   draw();
+
   frameId = requestAnimationFrame(animate);
 }
 
@@ -759,17 +935,19 @@ function finishPlayer() {
   const number = outputFor(index);
 
   $("bigNumber").textContent = String(number);
+
   $("status").textContent =
     `${game.names[index]} → ${number}번 도착!` +
-    (!wasDone && game.done.size === game.n
-      ? " 전원 완료! 전체 결과표를 확인하세요."
-      : "");
+    (
+      !wasDone && game.done.size === game.n
+        ? " 전원 완료! 전체 결과표를 확인하세요."
+        : ""
+    );
 
   updateControls();
   draw();
 }
 
-// 앱이나 탭에서 돌아왔을 때 경과 시간을 다시 확인
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && game && game.busy) {
     cancelAnimationFrame(frameId);
@@ -793,29 +971,60 @@ function geometry() {
 
 function project(p) {
   const g = geometry();
+
   const angle = p.theta + rotation;
   const depth = Math.sin(angle);
 
   return {
     x: g.cx + Math.cos(angle) * g.radius,
-    y: g.top + p.z * (g.bottom - g.top) + depth * g.ellipse,
+
+    y:
+      g.top +
+      p.z * (g.bottom - g.top) +
+      depth * g.ellipse,
+
     depth
   };
 }
 
 function roundedBox(x, y, width, height, radius) {
   ctx.beginPath();
+
   ctx.moveTo(x + radius, y);
-  ctx.arcTo(x + width, y, x + width, y + height, radius);
-  ctx.arcTo(x + width, y + height, x, y + height, radius);
-  ctx.arcTo(x, y + height, x, y, radius);
-  ctx.arcTo(x, y, x + width, y, radius);
+
+  ctx.arcTo(
+    x + width, y,
+    x + width, y + height,
+    radius
+  );
+
+  ctx.arcTo(
+    x + width, y + height,
+    x, y + height,
+    radius
+  );
+
+  ctx.arcTo(
+    x, y + height,
+    x, y,
+    radius
+  );
+
+  ctx.arcTo(
+    x, y,
+    x + width, y,
+    radius
+  );
+
   ctx.closePath();
 }
 
 function shortName(name) {
   const chars = Array.from(name);
-  return chars.length > 5 ? chars.slice(0, 4).join("") + "…" : name;
+
+  return chars.length > 5
+    ? chars.slice(0, 4).join("") + "…"
+    : name;
 }
 
 function drawOutputLabels() {
@@ -825,16 +1034,23 @@ function drawOutputLabels() {
   for (let lane = 0; lane < game.n; lane++) {
     endpoints.push({
       lane,
-      ...project(point(lane * TAU / game.n, 1))
+      ...project(
+        point(lane * TAU / game.n, 1)
+      )
     });
   }
 
-  endpoints.sort((a, b) => a.x - b.x || a.depth - b.depth);
+  endpoints.sort(
+    (a, b) => a.x - b.x || a.depth - b.depth
+  );
 
   const owners = new Map();
 
   for (const index of game.done) {
-    owners.set(game.paths[index].destination, index);
+    owners.set(
+      game.paths[index].destination,
+      index
+    );
   }
 
   const selectedLane =
@@ -846,69 +1062,117 @@ function drawOutputLabels() {
   const slotWidth = (viewWidth - 20) / columns;
   const badgeWidth = Math.min(45, slotWidth - 5);
 
-  // 먼저 안내선을 모두 그리고, 그 위에 숫자 배지를 그린다.
   const labels = endpoints.map((endpoint, index) => {
     const row = Math.floor(index / columns);
     const column = index % columns;
 
-    const x = 10 + (column + 0.5) * slotWidth;
-    const y = g.labelTop + row * 43 + 17;
+    const x =
+      10 + (column + 0.5) * slotWidth;
+
+    const y =
+      g.labelTop + row * 43 + 17;
 
     const owner = owners.get(endpoint.lane);
     const completed = owner !== undefined;
-    const selected = endpoint.lane === selectedLane;
 
     return {
-      endpoint, x, y, completed, selected,
-      color: completed ? colorFor(owner, game.n) : "#64748b"
+      endpoint,
+      x,
+      y,
+      completed,
+      selected: endpoint.lane === selectedLane,
+
+      color: completed
+        ? colorFor(owner, game.n)
+        : "#64748b"
     };
   });
 
-  // 선택된 안내선은 마지막에 그려 더 잘 보이게 한다.
   const ordered = [...labels].sort(
     (a, b) => Number(a.selected) - Number(b.selected)
   );
 
+  // 안내선을 먼저 그린다.
   for (const label of ordered) {
-    const { endpoint, x, y, selected, color } = label;
+    const {
+      endpoint, x, y, selected, color
+    } = label;
 
     ctx.beginPath();
+
     ctx.moveTo(endpoint.x, endpoint.y);
     ctx.lineTo(x, y - 17);
+
     ctx.strokeStyle = color;
     ctx.lineWidth = selected ? 3 : 1;
-    ctx.globalAlpha = selected ? 1 : 0.18;
+    ctx.globalAlpha = selected ? 1 : 0.16;
+
     ctx.stroke();
 
     ctx.globalAlpha = 1;
+
     ctx.beginPath();
-    ctx.arc(endpoint.x, endpoint.y, selected ? 6 : 3, 0, TAU);
+    ctx.arc(
+      endpoint.x,
+      endpoint.y,
+      selected ? 6 : 3,
+      0,
+      TAU
+    );
+
     ctx.fillStyle = color;
     ctx.fill();
   }
 
+  // 숫자 배지는 안내선 위에 그린다.
   for (const label of labels) {
-    const { endpoint, x, y, completed, selected, color } = label;
+    const {
+      endpoint, x, y,
+      completed, selected, color
+    } = label;
 
-    roundedBox(x - badgeWidth / 2, y - 17, badgeWidth, 34, 8);
+    roundedBox(
+      x - badgeWidth / 2,
+      y - 17,
+      badgeWidth,
+      34,
+      8
+    );
 
-    ctx.fillStyle = completed ? color : "#ffffff";
+    ctx.fillStyle =
+      completed ? color : "#ffffff";
+
     ctx.fill();
-    ctx.strokeStyle = selected ? "#111827" : color;
-    ctx.lineWidth = selected ? 3 : 1.5;
+
+    ctx.strokeStyle =
+      selected ? "#111827" : color;
+
+    ctx.lineWidth =
+      selected ? 3 : 1.5;
+
     ctx.stroke();
 
-    ctx.fillStyle = completed ? "#ffffff" : "#0f172a";
+    ctx.fillStyle =
+      completed ? "#ffffff" : "#0f172a";
+
     ctx.font = "800 20px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.fillText(String(game.outputs[endpoint.lane]), x, y + 1);
+    ctx.fillText(
+      String(game.outputs[endpoint.lane]),
+      x,
+      y + 1
+    );
   }
 }
 
 function draw() {
-  ctx.clearRect(0, 0, viewWidth, viewHeight);
+  ctx.clearRect(
+    0, 0,
+    viewWidth, viewHeight
+  );
+
   if (!game) return;
 
   const segments = [];
@@ -925,7 +1189,7 @@ function draw() {
     });
   }
 
-  // 위아래 원형 경계
+  // 원기둥의 위아래 경계
   for (const z of [0, 1]) {
     for (let j = 0; j < 120; j++) {
       addSegment(
@@ -938,18 +1202,31 @@ function draw() {
   // 세로 경로
   for (let lane = 0; lane < game.n; lane++) {
     const angle = lane * TAU / game.n;
-    addSegment(point(angle, 0), point(angle, 1));
+
+    addSegment(
+      point(angle, 0),
+      point(angle, 1)
+    );
   }
 
   // 가로 연결선
   for (const bridge of game.bridges) {
-    const start = bridge.lane * TAU / game.n;
+    const start =
+      bridge.lane * TAU / game.n;
+
     const step = TAU / game.n;
 
     for (let j = 0; j < 18; j++) {
       addSegment(
-        point(start + step * j / 18, bridge.z),
-        point(start + step * (j + 1) / 18, bridge.z)
+        point(
+          start + step * j / 18,
+          bridge.z
+        ),
+
+        point(
+          start + step * (j + 1) / 18,
+          bridge.z
+        )
       );
     }
   }
@@ -958,34 +1235,51 @@ function draw() {
 
   if (game.active !== null) {
     visible = visiblePath(
-      game.paths[game.active], game.fraction
+      game.paths[game.active],
+      game.fraction
     );
 
     for (let i = 1; i < visible.length; i++) {
-      addSegment(visible[i - 1], visible[i], true);
+      addSegment(
+        visible[i - 1],
+        visible[i],
+        true
+      );
     }
   }
 
-  // 뒤쪽부터 그린다.
-  segments.sort((a, b) =>
-    a.depth - b.depth ||
-    Number(a.highlighted) - Number(b.highlighted)
+  segments.sort(
+    (a, b) =>
+      a.depth - b.depth ||
+      Number(a.highlighted) -
+      Number(b.highlighted)
   );
 
   for (const segment of segments) {
     ctx.beginPath();
+
     ctx.moveTo(segment.a.x, segment.a.y);
     ctx.lineTo(segment.b.x, segment.b.y);
 
     if (segment.highlighted) {
-      ctx.strokeStyle = colorFor(game.active, game.n);
+      ctx.strokeStyle =
+        colorFor(game.active, game.n);
+
       ctx.lineWidth = 4;
-      ctx.globalAlpha = segment.depth < 0 ? .65 : 1;
+
+      ctx.globalAlpha =
+        segment.depth < 0 ? 0.65 : 1;
     } else {
       ctx.strokeStyle =
-        segment.depth < 0 ? "#aab7c9" : "#64748b";
+        segment.depth < 0
+          ? "#aab7c9"
+          : "#64748b";
+
       ctx.lineWidth = 1.1;
-      ctx.globalAlpha = segment.depth < 0 ? .25 : .75;
+
+      // 뒤쪽 선을 연하게 해 시각적 복잡도를 줄인다.
+      ctx.globalAlpha =
+        segment.depth < 0 ? 0.20 : 0.70;
     }
 
     ctx.stroke();
@@ -995,24 +1289,37 @@ function draw() {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // 출발점 이름: 인원이 많으면 참가자 번호로 간략 표시
+  // 출발 위치 표시
   for (let lane = 0; lane < game.n; lane++) {
-    const p = project(point(lane * TAU / game.n, 0));
+    const p = project(
+      point(lane * TAU / game.n, 0)
+    );
 
     ctx.beginPath();
     ctx.arc(p.x, p.y, 3.5, 0, TAU);
-    ctx.fillStyle = colorFor(lane, game.n);
+
+    ctx.fillStyle =
+      colorFor(lane, game.n);
+
     ctx.fill();
 
     const showName =
       game.n <= 8 || lane === game.active;
 
-    ctx.font = "650 12px system-ui, sans-serif";
-    ctx.fillStyle = colorFor(lane, game.n);
-    ctx.globalAlpha = p.depth < 0 ? .55 : 1;
+    ctx.font =
+      "650 12px system-ui, sans-serif";
+
+    ctx.fillStyle =
+      colorFor(lane, game.n);
+
+    ctx.globalAlpha =
+      p.depth < 0 ? 0.5 : 1;
 
     ctx.fillText(
-      showName ? shortName(game.names[lane]) : `${lane + 1}번`,
+      showName
+        ? shortName(game.names[lane])
+        : `${lane + 1}번`,
+
       p.x,
       p.y - 18
     );
@@ -1022,14 +1329,20 @@ function draw() {
 
   drawOutputLabels();
 
-  // 현재 이동점은 가장 위에 표시
+  // 이동 중인 점
   if (visible && visible.length) {
-    const head = project(visible[visible.length - 1]);
+    const head = project(
+      visible[visible.length - 1]
+    );
 
     ctx.beginPath();
     ctx.arc(head.x, head.y, 7, 0, TAU);
-    ctx.fillStyle = colorFor(game.active, game.n);
+
+    ctx.fillStyle =
+      colorFor(game.active, game.n);
+
     ctx.fill();
+
     ctx.lineWidth = 2.5;
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
@@ -1038,7 +1351,12 @@ function draw() {
   ctx.fillStyle = "#64748b";
   ctx.font = "12px system-ui, sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText("위: 출발 / 아래: 무작위 도착 숫자", 12, 22);
+
+  ctx.fillText(
+    "위: 출발 / 아래: 무작위 도착 숫자",
+    12,
+    22
+  );
 }
 
 function resizeCanvas() {
@@ -1047,39 +1365,65 @@ function resizeCanvas() {
   viewWidth = canvas.clientWidth;
   viewHeight = canvas.clientHeight;
 
-  const dpr = window.devicePixelRatio || 1;
+  const dpr =
+    window.devicePixelRatio || 1;
 
-  canvas.width = Math.round(viewWidth * dpr);
-  canvas.height = Math.round(viewHeight * dpr);
+  canvas.width =
+    Math.round(viewWidth * dpr);
 
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  canvas.height =
+    Math.round(viewHeight * dpr);
+
+  ctx.setTransform(
+    dpr, 0,
+    0, dpr,
+    0, 0
+  );
+
   draw();
 }
 
-function appendResultRow(target, index, number, numberFirst) {
-  const row = document.createElement("tr");
-  const nameCell = document.createElement("td");
-  const numberCell = document.createElement("td");
+function appendResultRow(
+  target,
+  index,
+  number,
+  numberFirst
+) {
+  const row =
+    document.createElement("tr");
 
-  const dot = document.createElement("span");
+  const nameCell =
+    document.createElement("td");
+
+  const numberCell =
+    document.createElement("td");
+
+  const dot =
+    document.createElement("span");
+
   dot.className = "color-dot";
-  dot.style.background = colorFor(index, game.n);
+
+  dot.style.background =
+    colorFor(index, game.n);
 
   nameCell.append(
     dot,
     document.createTextNode(game.names[index])
   );
 
-  const pill = document.createElement("span");
+  const pill =
+    document.createElement("span");
+
   pill.className = "number-pill";
   pill.textContent = String(number);
+
   numberCell.append(pill);
 
-  row.append(...(
-    numberFirst
-      ? [numberCell, nameCell]
-      : [nameCell, numberCell]
-  ));
+  if (numberFirst) {
+    row.append(numberCell, nameCell);
+  } else {
+    row.append(nameCell, numberCell);
+  }
 
   target.append(row);
 }
@@ -1090,57 +1434,86 @@ function revealResults() {
     game.busy ||
     game.done.size !== game.n ||
     game.revealed
-  ) return;
+  ) {
+    return;
+  }
 
   $("resultByName").replaceChildren();
   $("resultByNumber").replaceChildren();
 
-  const results = game.names.map((_, index) => ({
-    index,
-    number: outputFor(index)
-  }));
+  const results = game.names.map(
+    (_, index) => ({
+      index,
+      number: outputFor(index)
+    })
+  );
 
   results.forEach(({ index, number }) => {
-    appendResultRow($("resultByName"), index, number, false);
+    appendResultRow(
+      $("resultByName"),
+      index,
+      number,
+      false
+    );
   });
 
   [...results]
     .sort((a, b) => a.number - b.number)
     .forEach(({ index, number }) => {
-      appendResultRow($("resultByNumber"), index, number, true);
+      appendResultRow(
+        $("resultByNumber"),
+        index,
+        number,
+        true
+      );
     });
 
   game.revealed = true;
+
   updateControls();
 
   $("resultPanel").hidden = false;
 
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
   $("resultPanel").scrollIntoView({
-    behavior: window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches ? "auto" : "smooth",
+    behavior:
+      reducedMotion ? "auto" : "smooth",
+
     block: "start"
   });
 }
 
-$("applyCount").addEventListener("click", makeNameFields);
-$("generate").addEventListener("click", generateGame);
-$("reveal").addEventListener("click", revealResults);
+$("applyCount").addEventListener(
+  "click",
+  makeNameFields
+);
+
+$("generate").addEventListener(
+  "click",
+  generateGame
+);
+
+$("reveal").addEventListener(
+  "click",
+  revealResults
+);
 
 $("rotation").addEventListener("input", () => {
   if (game && game.busy) return;
-  rotation = Number($("rotation").value) * Math.PI / 180;
+
+  rotation =
+    Number($("rotation").value) *
+    Math.PI / 180;
+
   draw();
 });
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
 
-// 움직임 최소화를 설정한 기기에서는 자동 회전을 기본 해제한다.
-if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  $("autoRotate").checked = false;
-}
-
-makeNameFields();
-</script>
-</body>
-</html>
+// 기기의 움직임 최
