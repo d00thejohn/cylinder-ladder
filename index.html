@@ -98,6 +98,12 @@
     opacity: 0.45;
   }
 
+  button:focus-visible,
+  input:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+  }
+
   input[type="number"],
   input[type="text"] {
     width: 100%;
@@ -187,6 +193,65 @@
 
   #rotation {
     width: min(210px, 55vw);
+  }
+
+  .speed-panel {
+    margin: 16px 0;
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #f8fafc;
+  }
+
+  .speed-panel > label {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-weight: 650;
+  }
+
+  .speed-inputs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  #travelTime {
+    flex: 1;
+    min-width: 100px;
+    min-height: 36px;
+    accent-color: var(--blue);
+  }
+
+  #travelTimeNumber {
+    width: 82px;
+    min-height: 44px;
+    text-align: center;
+  }
+
+  .speed-presets {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .speed-presets button {
+    padding: 9px 6px;
+    font-size: 13px;
+  }
+
+  .speed-presets button.selected {
+    border-color: var(--blue);
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  #speedDescription {
+    margin-bottom: 0;
   }
 
   #resultCard {
@@ -313,6 +378,14 @@
       grid-template-columns: 1fr;
     }
 
+    .speed-presets {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #travelTime {
+      min-width: 90px;
+    }
+
     #resultCard {
       padding: 13px;
     }
@@ -331,8 +404,9 @@
   <h1>원기둥 사다리게임</h1>
 
   <p class="muted">
-    이름을 누르면 사다리를 따라 약 4.8초 동안 내려갑니다.
-    밑면 숫자는 무작위로 배정되며 게임 중에는 바뀌지 않습니다.
+    이름을 누르면 설정한 속도로 내려갑니다.
+    기본 이동 시간은 7.2초이며,
+    밑면 숫자는 게임을 생성할 때 무작위로 배정됩니다.
   </p>
 
   <section class="card">
@@ -378,7 +452,10 @@
         id="canvas"
         role="img"
         aria-label="회전하는 원기둥 사다리와 도착 숫자"
-      ></canvas>
+      >
+        참가자 이름 버튼으로 게임을 진행할 수 있습니다.
+        도착 결과는 아래 안내와 최종 결과표에 표시됩니다.
+      </canvas>
     </div>
 
     <div class="controls">
@@ -398,10 +475,68 @@
       >
     </div>
 
+    <div class="speed-panel">
+      <label for="travelTime">
+        이동 속도 조절
+        <span class="muted">
+          시간이 길수록 천천히 이동합니다.
+        </span>
+      </label>
+
+      <div class="speed-inputs">
+        <span class="muted">빠르게</span>
+
+        <input
+          id="travelTime"
+          type="range"
+          min="2"
+          max="15"
+          step="0.1"
+          value="7.2"
+          aria-label="이동 시간, 초 단위"
+        >
+
+        <span class="muted">천천히</span>
+
+        <input
+          id="travelTimeNumber"
+          type="number"
+          min="2"
+          max="15"
+          step="0.1"
+          value="7.2"
+          inputmode="decimal"
+          aria-label="이동 시간 직접 입력"
+        >
+
+        <span>초</span>
+      </div>
+
+      <div class="speed-presets">
+        <button type="button" data-travel-time="4.8">
+          기존 속도 · 4.8초
+        </button>
+
+        <button type="button" data-travel-time="7.2">
+          기본 속도 · 7.2초
+        </button>
+
+        <button type="button" data-travel-time="10">
+          천천히 · 10초
+        </button>
+
+        <button type="button" data-travel-time="15">
+          아주 천천히 · 15초
+        </button>
+      </div>
+
+      <p id="speedDescription" class="muted"></p>
+    </div>
+
     <p class="muted">
       자동 회전이 불편하면 체크를 해제하세요.
       완료한 이름을 다시 누르면 같은 경로를 재생합니다.
-      아래 숫자 배지는 안내선으로 실제 도착점과 연결되어 있습니다.
+      아래 숫자 배지는 안내선으로 실제 도착점과 연결됩니다.
     </p>
 
     <div id="resultCard" role="status" aria-live="polite">
@@ -409,7 +544,12 @@
       <div id="bigNumber" aria-label="도착 숫자">?</div>
     </div>
 
-    <progress id="progress" value="0" max="6"></progress>
+    <progress
+      id="progress"
+      value="0"
+      max="6"
+      aria-label="도착 완료 인원"
+    ></progress>
 
     <div class="controls">
       <span id="completedText">0 / 6명 완료</span>
@@ -470,10 +610,14 @@ const ctx = canvas.getContext("2d");
 
 const TAU = Math.PI * 2;
 
-// 이동 시간: 4.8초
-const DURATION = 4800;
+// 이전 속도와 기본 속도
+const ORIGINAL_TRAVEL_SECONDS = 4.8;
+const DEFAULT_TRAVEL_SECONDS = 7.2;
 
-// 값이 클수록 회전이 목표 각도를 더 완만하게 따라간다.
+const MIN_TRAVEL_SECONDS = 2;
+const MAX_TRAVEL_SECONDS = 15;
+
+// 값이 클수록 회전이 목표 각도를 완만하게 따라간다.
 const ROTATION_SMOOTHING_MS = 120;
 
 let game = null;
@@ -517,6 +661,47 @@ function syncRotationSlider() {
   $("rotation").value = String(
     normalizeAngle(rotation) * 180 / Math.PI
   );
+}
+
+function setTravelTime(value) {
+  const parsed = Number.parseFloat(value);
+
+  const seconds = Number.isFinite(parsed)
+    ? Math.round(
+        Math.min(
+          MAX_TRAVEL_SECONDS,
+          Math.max(MIN_TRAVEL_SECONDS, parsed)
+        ) * 10
+      ) / 10
+    : DEFAULT_TRAVEL_SECONDS;
+
+  $("travelTime").value = seconds.toFixed(1);
+  $("travelTimeNumber").value = seconds.toFixed(1);
+
+  const relativeSpeed =
+    ORIGINAL_TRAVEL_SECONDS / seconds * 100;
+
+  $("speedDescription").textContent =
+    `移動時間 ${seconds.toFixed(1)}초 · ` +
+    `기존 대비 속도 ${relativeSpeed.toFixed(1)}%`;
+
+  document
+    .querySelectorAll("[data-travel-time]")
+    .forEach(button => {
+      const selected =
+        Math.abs(
+          Number(button.dataset.travelTime) - seconds
+        ) < 0.01;
+
+      button.classList.toggle("selected", selected);
+
+      button.setAttribute(
+        "aria-pressed",
+        String(selected)
+      );
+    });
+
+  return seconds;
 }
 
 function getCount() {
@@ -708,17 +893,27 @@ function updateControls() {
       ? "전체 결과표 보기"
       : "전원 도착 후 결과 공개";
 
-  $("rotation").disabled = game.busy;
-  $("autoRotate").disabled = game.busy;
-
-  // 이동 도중 실수로 설정을 바꾸지 못하도록 잠근다.
-  $("count").disabled = game.busy;
-  $("applyCount").disabled = game.busy;
-  $("generate").disabled = game.busy;
+  [
+    "rotation",
+    "autoRotate",
+    "travelTime",
+    "travelTimeNumber",
+    "count",
+    "applyCount",
+    "generate"
+  ].forEach(id => {
+    $(id).disabled = game.busy;
+  });
 
   $("nameFields").querySelectorAll("input").forEach(input => {
     input.disabled = game.busy;
   });
+
+  document
+    .querySelectorAll("[data-travel-time]")
+    .forEach(button => {
+      button.disabled = game.busy;
+    });
 }
 
 function generateGame() {
@@ -754,7 +949,7 @@ function generateGame() {
       input.value.trim() || `${index + 1}번`
   );
 
-  // 기존 max(24, count * 8)보다 연결선 25% 감소
+  // 이전 복잡한 버전보다 연결선 25% 감소
   const bridgeCount = Math.max(18, count * 6);
 
   const bridges = [];
@@ -794,6 +989,7 @@ function generateGame() {
     revealed: false,
     startedAt: 0,
     lastFrameAt: 0,
+    duration: DEFAULT_TRAVEL_SECONDS * 1000,
     rotateDuringRun: true
   };
 
@@ -825,7 +1021,7 @@ function generateGame() {
   $("resultByNumber").replaceChildren();
 
   $("status").textContent =
-    "참가자 이름을 눌러 주세요.";
+    "속도를 조절한 뒤 참가자 이름을 눌러 주세요.";
 
   $("bigNumber").textContent = "?";
   $("bigNumber").style.color = "#1d4ed8";
@@ -842,14 +1038,20 @@ function startPlayer(index) {
 
   cancelAnimationFrame(frameId);
 
+  // 직접 입력한 값을 확인하고 범위 안으로 보정
+  const seconds = setTravelTime(
+    $("travelTimeNumber").value
+  );
+
   game.active = index;
   game.busy = true;
   game.fraction = 0;
+  game.duration = seconds * 1000;
 
   game.rotateDuringRun =
     $("autoRotate").checked;
 
-  // 출발점을 앞쪽 중앙에 배치한다.
+  // 출발점을 앞쪽 중앙에 배치
   if (game.rotateDuringRun) {
     rotation =
       Math.PI / 2 -
@@ -861,7 +1063,8 @@ function startPlayer(index) {
   const color = colorFor(index, game.n);
 
   $("status").textContent =
-    `${game.names[index]} — 출발!`;
+    `${game.names[index]} — 출발! ` +
+    `이동 시간 ${seconds.toFixed(1)}초`;
 
   $("bigNumber").textContent = "…";
   $("bigNumber").style.color = color;
@@ -886,7 +1089,7 @@ function animate() {
   game.lastFrameAt = now;
 
   game.fraction = Math.min(
-    elapsed / DURATION,
+    elapsed / game.duration,
     1
   );
 
@@ -913,8 +1116,6 @@ function animate() {
   }
 
   if (game.fraction >= 1) {
-    // 도착 직전의 아주 작은 회전 오차는 그대로 두어
-    // 끝나는 순간 갑자기 회전하지 않도록 한다.
     finishPlayer();
     return;
   }
@@ -1112,6 +1313,7 @@ function drawOutputLabels() {
     ctx.globalAlpha = 1;
 
     ctx.beginPath();
+
     ctx.arc(
       endpoint.x,
       endpoint.y,
@@ -1189,7 +1391,7 @@ function draw() {
     });
   }
 
-  // 원기둥의 위아래 경계
+  // 원기둥 위아래 경계
   for (const z of [0, 1]) {
     for (let j = 0; j < 120; j++) {
       addSegment(
@@ -1277,7 +1479,6 @@ function draw() {
 
       ctx.lineWidth = 1.1;
 
-      // 뒤쪽 선을 연하게 해 시각적 복잡도를 줄인다.
       ctx.globalAlpha =
         segment.depth < 0 ? 0.20 : 0.70;
     }
@@ -1329,7 +1530,7 @@ function draw() {
 
   drawOutputLabels();
 
-  // 이동 중인 점
+  // 현재 이동 중인 점
   if (visible && visible.length) {
     const head = project(
       visible[visible.length - 1]
@@ -1486,6 +1687,7 @@ function revealResults() {
   });
 }
 
+// 참가자 설정
 $("applyCount").addEventListener(
   "click",
   makeNameFields
@@ -1496,11 +1698,13 @@ $("generate").addEventListener(
   generateGame
 );
 
+// 최종 결과
 $("reveal").addEventListener(
   "click",
   revealResults
 );
 
+// 수동 회전
 $("rotation").addEventListener("input", () => {
   if (game && game.busy) return;
 
@@ -1511,9 +1715,28 @@ $("rotation").addEventListener("input", () => {
   draw();
 });
 
+// 이동 시간 조절
+$("travelTime").addEventListener("input", event => {
+  setTravelTime(event.target.value);
+});
+
+$("travelTimeNumber").addEventListener("change", event => {
+  setTravelTime(event.target.value);
+});
+
+document
+  .querySelectorAll("[data-travel-time]")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      if (game && game.busy) return;
+
+      setTravelTime(button.dataset.travelTime);
+    });
+  });
+
 window.addEventListener(
   "resize",
   resizeCanvas
 );
 
-// 기기의 움직임 최
+// 움직임 최소화 설정을
